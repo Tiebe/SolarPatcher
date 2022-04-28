@@ -147,15 +147,15 @@ private fun loadCustomMods(): List<Mod> {
 }
 
 // Utility method for providing mod loaders
-private fun modLoaders(textMods: List<TextMod>) =
-    (customMods + loadCustomMods()).map { it.loader } + textMods.map {
+private fun modLoaders(textMods: List<TextMod>): List<MethodVisitor.() -> Unit> {
+    return customMods.map { it.loader } + loadCustomMods().map { it.loader } + textMods.map {
         {
             visitLdcInsn(it.id)
             visitLdcInsn(it.text)
             invokeMethod(::createTextMod)
         }
     }
-
+}
 
 // Utility method to get the language map
 private fun langMap(textMods: List<TextMod>) =
