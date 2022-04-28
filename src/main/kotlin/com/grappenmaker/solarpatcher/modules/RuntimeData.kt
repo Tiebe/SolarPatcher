@@ -26,6 +26,7 @@ import com.grappenmaker.solarpatcher.asm.transform.ClassTransform
 import com.grappenmaker.solarpatcher.asm.util.getField
 import com.grappenmaker.solarpatcher.asm.util.invokeMethod
 import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.PUTSTATIC
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
