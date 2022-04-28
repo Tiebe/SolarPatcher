@@ -101,12 +101,12 @@ object RuntimeData : Module() {
     lateinit var getDisplayToIPMapMethod: MethodDescription
     lateinit var getServerMappingsMethod: MethodDescription
     lateinit var getLunarmainMethod: MethodDescription
-    lateinit var getClientBridgeMethod: MethodDescription
     lateinit var toBridgeComponentMethod: MethodDescription
     lateinit var renderLayerMethod: MethodDescription
     lateinit var shouldRenderLayerMethod: MethodDescription
 
     // Field descriptions that have been found
+    lateinit var clientInstance: FieldDescription
     lateinit var assetsSocketField: FieldDescription
     lateinit var positionField: FieldDescription
 
@@ -131,9 +131,10 @@ object RuntimeData : Module() {
                     && it.owner.name.startsWith("net/minecraft/")
         }
 
-        +FindMethod({
-            getClientBridgeMethod = it.method.calls.first().asDescription()
-        }) { it.method.calls(matchName("getLunarServer")) && it.owner.calls(matchName("bridge\$getPlayer")) }
+        +FindMethod({ (_, method) ->
+            val insn = method.instructions.filterIsInstance<FieldInsnNode>().first { it.opcode == PUTSTATIC }
+            clientInstance = insn.asDescription()
+        }) { it.method.hasConstant("Can't reset Minecraft Client instance!") }
 
         +FindMethod({ (_, method) ->
             toBridgeComponentMethod = method.calls
@@ -275,7 +276,7 @@ fun MethodVisitor.getAssetsSocket() {
 
 // Utility to load the client bridge onto the stack
 fun MethodVisitor.getClientBridge() =
-    invokeMethod(InvocationType.STATIC, RuntimeData.getClientBridgeMethod)
+    getField(RuntimeData.clientInstance, static = true)
 
 // Utility to load the current server data onto the stack
 fun MethodVisitor.getServerData() {
