@@ -96,6 +96,7 @@ object RuntimeData : Module() {
         featureDetailsClass != null &&
                 Type.getReturnType(it.method.desc).internalName == featureDetailsClass
     }
+    val getGameDirMethod by +findBridgeMethod("bridge\$getMcDataDir")
 
     // Method descriptions that have been found
     lateinit var getDisplayToIPMapMethod: MethodDescription

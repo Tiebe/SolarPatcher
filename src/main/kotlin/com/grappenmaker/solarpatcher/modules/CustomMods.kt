@@ -24,6 +24,7 @@ import com.grappenmaker.solarpatcher.asm.matching.asMatcher
 import com.grappenmaker.solarpatcher.asm.method.InvocationType
 import com.grappenmaker.solarpatcher.asm.transform.ClassTransform
 import com.grappenmaker.solarpatcher.asm.util.*
+import com.grappenmaker.solarpatcher.util.generation.Accessors
 import com.grappenmaker.solarpatcher.util.generation.createAccountNameMod
 import com.grappenmaker.solarpatcher.util.generation.createTextMod
 import kotlinx.serialization.Serializable
@@ -137,15 +138,24 @@ private val nameMod = Mod("account-name", "Account Name") {
 // List of custom mods
 private val customMods = listOf(nameMod)
 
+// Load custom mods from solarMods directory
+private fun loadCustomMods(): List<Mod> {
+    val gameDir = Accessors.Utility.getMCDataDir()
+
+    println(gameDir)
+    return listOf()
+}
+
 // Utility method for providing mod loaders
-private fun modLoaders(textMods: List<TextMod>) =
-    customMods.map { it.loader } + textMods.map {
+private fun modLoaders(textMods: List<TextMod>): List<MethodVisitor.() -> Unit> {
+    return customMods.map { it.loader } + loadCustomMods().map { it.loader } + textMods.map {
         {
             visitLdcInsn(it.id)
             visitLdcInsn(it.text)
             invokeMethod(::createTextMod)
         }
     }
+}
 
 // Utility method to get the language map
 private fun langMap(textMods: List<TextMod>) =
