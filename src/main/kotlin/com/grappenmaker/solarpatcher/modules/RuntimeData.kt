@@ -25,12 +25,18 @@ import com.grappenmaker.solarpatcher.asm.method.MethodDescription
 import com.grappenmaker.solarpatcher.asm.transform.ClassTransform
 import com.grappenmaker.solarpatcher.asm.util.getField
 import com.grappenmaker.solarpatcher.asm.util.invokeMethod
+import com.grappenmaker.solarpatcher.config.json
+import com.grappenmaker.solarpatcher.util.generation.Accessors
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.PUTSTATIC
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
 import java.lang.reflect.Modifier
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
