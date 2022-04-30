@@ -25,7 +25,6 @@ import com.grappenmaker.solarpatcher.asm.method.InvocationType
 import com.grappenmaker.solarpatcher.asm.transform.ClassTransform
 import com.grappenmaker.solarpatcher.asm.util.*
 import com.grappenmaker.solarpatcher.configuration
-import com.grappenmaker.solarpatcher.util.generation.Accessors
 import com.grappenmaker.solarpatcher.util.generation.createAccountNameMod
 import com.grappenmaker.solarpatcher.util.generation.createTextMod
 import kotlinx.serialization.Serializable
@@ -35,6 +34,7 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
+import kotlin.reflect.KFunction
 
 // TextMod class for user configurable custom mods
 @Serializable
@@ -44,6 +44,12 @@ val TextMod.id get() = "${name.lowercase()}-custom"
 
 // Mod class for keeping track of mod data
 class Mod(val id: String, val displayName: String, val loader: MethodVisitor.() -> Unit)
+
+private fun createSimpleMod(id: String, displayName: String, method: KFunction<*>) =
+    Mod(id, displayName) {
+        visitLdcInsn(id)
+        invokeMethod(method)
+    }
 
 // Joined module that allows creation of custom mods
 @Serializable
@@ -136,7 +142,7 @@ private object LangMapper : Module() {
 private val mods by lazy { registerMods(configuration.customMods.textMods) }
 
 // TODO: mod system
-fun registerMods(configured: List<TextMod>) = listOf(nameMod) + loadCustomMods() + configured.map {
+fun registerMods(configured: List<TextMod>) = listOf(nameMod) + configured.map {
     Mod(it.id, it.name) {
         visitLdcInsn(it.id)
         visitLdcInsn(it.text)
@@ -145,33 +151,4 @@ fun registerMods(configured: List<TextMod>) = listOf(nameMod) + loadCustomMods()
 }
 
 // Custom mod that shows your account name
-private val nameMod = Mod("account-name", "Account Name") {
-    visitLdcInsn("account-name")
-    invokeMethod(::createAccountNameMod)
-}
-
-// List of custom mods
-private val customMods = listOf(nameMod)
-
-// Load custom mods from solarMods directory
-private fun loadCustomMods(): List<Mod> {
-    val gameDir = Accessors.Utility.getMCDataDir()
-
-    println(gameDir)
-    return listOf()
-}
-
-// Utility method for providing mod loaders
-private fun modLoaders(textMods: List<TextMod>): List<MethodVisitor.() -> Unit> {
-    return customMods.map { it.loader } + loadCustomMods().map { it.loader } + textMods.map {
-        {
-            visitLdcInsn(it.id)
-            visitLdcInsn(it.text)
-            invokeMethod(::createTextMod)
-        }
-    }
-}
-
-// Utility method to get the language map
-private fun langMap(textMods: List<TextMod>) =
-    customMods.associate { it.id to it.displayName } + textMods.associate { it.id to it.name }
+private val nameMod = createSimpleMod("account-name", "Account Name", ::createAccountNameMod)
