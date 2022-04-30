@@ -16,20 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Constant values
-object Constants {
-    const val premainClass = "com.grappenmaker.solarpatcher.AgentMain"
-    const val saveConfigClass = "com.grappenmaker.solarpatcher.config.SaveDefaultConfig"
-    const val defaultConfig = "config.example.json"
-    const val updaterConfig = "updater.json"
-}
+package com.grappenmaker.solarpatcher.modules.mods;
 
-// Versions of dependencies
-object Versions {
-    const val project = "1.6.1"
-    const val kotlin = "1.6.10"
-    const val serializationJSON = "1.3.2"
-    const val asm = "9.2"
-    const val detekt = "1.19.0"
-    const val gson = "2.9.0"
+
+import com.google.gson.Gson;
+import kotlinx.serialization.json.Json;
+
+import java.io.IOException;
+
+public abstract class Mod {
+
+    public abstract void onEnable();
+    public abstract void onDisable();
+
+
+    public ModInfo getModInfo() {
+        try {
+            if (getClass().getResource("mod-info.json") == null) throw new IOException("No mod-info.json found");
+
+            return new Gson().fromJson(getClass().getResource("mod-info.json").getContent().toString(), ModInfo.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
