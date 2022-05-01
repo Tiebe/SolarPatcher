@@ -21,6 +21,7 @@ package com.grappenmaker.solarpatcher.util.generation
 import com.grappenmaker.solarpatcher.asm.method.InvocationType
 import com.grappenmaker.solarpatcher.asm.util.*
 import com.grappenmaker.solarpatcher.modules.*
+import com.grappenmaker.solarpatcher.util.ensure
 import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -33,7 +34,7 @@ internal val utilityClass by lazy {
         with(visitMethod(Opcodes.ACC_PUBLIC, "getPlayerName", "()L$internalString;", null, null)) {
             visitCode()
             getPlayerBridge()
-            callBridgeMethod(RuntimeData.getPlayerNameMethod)
+            callBridgeMethod(Bridge.getPlayerNameMethod)
             returnMethod(Opcodes.ARETURN)
             visitMaxs(-1, -1)
             visitEnd()
@@ -42,7 +43,7 @@ internal val utilityClass by lazy {
         with(visitMethod(Opcodes.ACC_PUBLIC, "getPlayerUUID", "()L${getInternalName<UUID>()};", null, null)) {
             visitCode()
             getPlayerBridge()
-            callBridgeMethod(RuntimeData.getUUIDMethod)
+            callBridgeMethod(Bridge.getUUIDMethod)
             returnMethod(Opcodes.ARETURN)
             visitMaxs(-1, -1)
             visitEnd()
@@ -57,7 +58,7 @@ internal val utilityClass by lazy {
             dup()
             visitJumpInsn(Opcodes.IFNULL, label)
 
-            callBridgeMethod(RuntimeData.getServerIPMethod)
+            callBridgeMethod(Bridge.getServerIPMethod)
             returnMethod(Opcodes.ARETURN)
 
             visitLabel(label)
@@ -80,7 +81,7 @@ internal val utilityClass by lazy {
             getAssetsSocket()
 
             // Create packet
-            val popupMethod = RuntimeData.sendPopupMethod ?: error("No popup method?")
+            val popupMethod = OtherRuntimeData.sendPopupMethod.ensure()
             construct(
                 Type.getArgumentTypes(popupMethod.method.desc).first().internalName,
                 "(L$internalString;L$internalString;)V"
