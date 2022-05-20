@@ -20,7 +20,8 @@ package com.grappenmaker.solarpatcher.modules
 
 import com.grappenmaker.solarpatcher.asm.*
 import com.grappenmaker.solarpatcher.asm.matching.MethodMatching.matchName
-import com.grappenmaker.solarpatcher.asm.method.*
+import com.grappenmaker.solarpatcher.asm.method.InvocationType
+import com.grappenmaker.solarpatcher.asm.method.MethodDescription
 import com.grappenmaker.solarpatcher.asm.transform.ClassTransform
 import com.grappenmaker.solarpatcher.asm.util.getField
 import com.grappenmaker.solarpatcher.asm.util.invokeMethod
@@ -108,6 +109,7 @@ object Bridge : FinderContainer {
     val getServerDataMethod by +findBridgeMethod("bridge\$getCurrentServerData")
     val getServerIPMethod by +findBridgeMethod("bridge\$serverIP")
     val displayMessageMethod by +findBridgeMethod("bridge\$addChatMessage")
+    val getGameDirMethod by +findBridgeMethod("bridge\$getMcDataDir")
 
     private fun findBridgeMethod(
         name: String,
@@ -137,7 +139,6 @@ object ModRuntime : FinderContainer {
         featureDetailsClass != null &&
                 it.method.desc == "()L${featureDetailsClass.name};"
     }
-    val getGameDirMethod by +findBridgeMethod("bridge\$getMcDataDir")
 
     init {
         +FindClass({

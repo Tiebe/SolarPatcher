@@ -25,19 +25,16 @@ import kotlinx.serialization.json.Json;
 import java.io.IOException;
 
 public abstract class Mod {
+    public Mod(ModInfo modInfo) {
+        this.modInfo = modInfo;
+    }
+
+    private final ModInfo modInfo;
 
     public abstract void onEnable();
     public abstract void onDisable();
 
-
     public ModInfo getModInfo() {
-        try {
-            if (getClass().getResource("mod-info.json") == null) throw new IOException("No mod-info.json found");
-
-            return new Gson().fromJson(getClass().getResource("mod-info.json").getContent().toString(), ModInfo.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return modInfo;
     }
-
 }

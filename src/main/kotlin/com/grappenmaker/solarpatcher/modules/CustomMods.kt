@@ -36,6 +36,7 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
+import java.util.jar.JarFile
 import kotlin.reflect.KFunction
 
 // TextMod class for user configurable custom mods
@@ -146,8 +147,28 @@ private val mods by lazy { registerMods(configuration.customMods.textMods) }
 private fun loadCustomMods(): List<Mod> {
     val gameDir = Accessors.Utility.getMCDataDir()
 
-    println(gameDir)
+    val modsDir = gameDir.resolve("solar-mods")
+    for (mod in modsDir.listFiles()!!) {
+        if (mod.name.endsWith(".jar")) {
+            val jarFile = JarFile(mod)
+            loadCustomMod(jarFile)
+        }
+    }
+
     return listOf()
+}
+
+private fun loadCustomMod(mod: JarFile) {
+    for (modEntry in mod.entries()) {
+        println(modEntry)
+        println(modEntry.name.equals("mod-info.json"))
+        if (modEntry.name.equals("mod-info.json")) {
+            val modJson = mod.getInputStream(modEntry).bufferedReader().use { it.readText() }
+            println(modJson) // works!
+
+            // TODO: convert to modinfo class, load main class, and call onenable method
+        }
+    }
 }
 
 

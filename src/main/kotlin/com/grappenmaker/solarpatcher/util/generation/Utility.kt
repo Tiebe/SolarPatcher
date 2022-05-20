@@ -105,7 +105,7 @@ internal val utilityClass by lazy {
             visitCode()
 
             getClientBridge()
-            callBridgeMethod(RuntimeData.getGameDirMethod)
+            callBridgeMethod(Bridge.getGameDirMethod)
             returnMethod(Opcodes.ARETURN)
             visitMaxs(2, 1)
             visitEnd()
